@@ -1,6 +1,7 @@
 from exceptions.input_exceptions import GodNotFound, OptionNotFound, PathNotFound, Exit
+from utils import clear, exit, check_permission
+from const import FOLDER, PATH_FILE
 from smite_wiki import SmiteWiki
-from utils import clear, exit
 from asyncio import run
 
 import os
@@ -14,12 +15,12 @@ class UI:
 
     @staticmethod
     def __write_on_file(data: str) -> None:
-        with open("path_directory.bin", "wb") as file:
+        with open(PATH_FILE, "wb") as file:
             file.write(data.encode())
 
     @staticmethod
     def __read_from_file() -> str:
-        with open("path_directory.bin", "rb") as file:
+        with open(PATH_FILE, "rb") as file:
             return file.read().decode()
 
     @staticmethod
@@ -33,7 +34,7 @@ class UI:
         return option
 
     def __input_god(self) -> str:
-        choice = input("Inserisci il god: ").lower().strip()
+        choice = input("God: ").lower().strip()
         if not choice or choice == "exit":
             raise Exit
         elif not choice in self.__smitewiki.gods():
@@ -43,7 +44,7 @@ class UI:
 
     def __choice_path(self, path: str) -> str:
         clear()
-        choice = input("Usare questo percorso:\n\t{} ~ S/N ".format(path)).lower().strip()
+        choice = input("Usare questo percorso:\n\t{} ~ S/N ".format(os.path.join(path, FOLDER))).lower().strip()
         if not choice or choice == "exit":
             raise Exit
         elif choice == 's':
@@ -57,52 +58,41 @@ class UI:
             raise OptionNotFound
 
     def __check_path(self, path: str) -> str:
-
         path = os.path.join(*list(filter(None, path.split(os.sep))))
         if not os.name == "nt": path = os.sep + path
-
+        print(path)
         if os.path.exists(path):
+            if not check_permission(path):
+                raise PathNotFound
             while True:
-                if "voicelines" in os.listdir(path) and os.path.isdir(os.path.join(path, "voicelines")):
-                    choice = input("Usare la cartella :\n\t(Gia' presente) {}/voicelines ~ S/N ".format(path.split(os.sep)[-1])).lower().strip()
+                if FOLDER == path.split(os.sep)[-1]:
+                    path = os.path.join(*path.split(os.sep)[:-1])
+                    if not os.name == "nt": path = os.sep + path
+                    choice = input("Usare la cartella :\n\t(Gia' presente) {} ~ S/N ".format(os.path.join(path.split(os.sep)[-1], FOLDER))).lower().strip()
+                elif FOLDER in os.listdir(path) and os.path.isdir(os.path.join(path, FOLDER)):
+                    choice = input("Usare la cartella :\n\t(Gia' presente) {} ~ S/N ".format(os.path.join(path.split(os.sep)[-1], FOLDER))).lower().strip()
                 else:
-                    choice = input("Creare la cartella:\n\t{}/voicelines ~ S/N ".format(path.split(os.sep)[-1])).lower().strip()
+                    choice = input("Creare la cartella:\n\t{} ~ S/N ".format(os.path.join(path.split(os.sep)[-1], FOLDER))).lower().strip()
                 if not choice or choice == "exit": raise Exit
                 elif choice == "s": return path
                 elif choice == "n": raise PathNotFound
                 else: continue
         else:
             raise PathNotFound
-        #else:
-        #    dir = path.split(os.sep)[-1]
-        #    path_c = os.path.join(*list(filter(None, path.split(os.sep)[:-1])))
-        #    if not os.name == "nt": path_c = os.sep + path_c
-        #    if not os.path.exists(path_c): raise PathNotFound
-        #    else:
-        #        while True:
-        #            choice = input("Vuoi creare la cartella '{}' in '{}' S/N ".format(dir, path_c)).lower().strip()
-        #            if not choice or choice == "exit": raise Exit
-        #            elif choice == "s": 
-        #                os.mkdir(path)
-        #                return path
-        #            elif choice == "n": raise PathNotFound
-        #            else: continue
 
     def __change_path(self) -> str:
         clear()
         path = input("Percorso per la cartella: ")
         if not path:
             raise Exit
-
         try: path = self.__check_path(path)
         except Exit: exit()
         except PathNotFound: raise PathNotFound
-
         self.__write_on_file(path)
         return path
 
     def __get_url_directory(self) -> str:
-        path = self.__read_from_file() if os.path.exists("path_directory.bin") else None
+        path = self.__read_from_file() if os.path.exists(PATH_FILE) else None
         if path:
             while True:
                 try: return self.__choice_path(path)

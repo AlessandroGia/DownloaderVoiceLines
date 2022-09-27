@@ -2,6 +2,7 @@ from asyncio import ensure_future, gather
 from aiohttp import ClientSession
 from utils import check_path
 from vgs_parser import Vgs
+from const import FOLDER
 
 import os
 
@@ -9,7 +10,7 @@ import os
 class Downloader:
 
     def __init__(self, url: str) -> None:
-        self.__path = os.path.join(url, "voicelines")
+        self.__path = os.path.join(url, FOLDER)
         self.__path_vgs = None
         self.__downloaded = 0
         check_path(self.__path)

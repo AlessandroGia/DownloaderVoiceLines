@@ -5,6 +5,10 @@ from requests import get
 import sys
 import os
 
+def check_permission(path: str) -> bool:
+    ''' Check if a directory can be updated
+    '''
+    return os.access(path, os.X_OK | os.W_OK)
 
 def check_path(path: str) -> None:
     ''' Create directory if path doesn't exists
@@ -33,4 +37,5 @@ def clear() -> None:
 def exit() -> None:
     ''' Exit from the script
     '''
+    clear()
     sys.exit(0)
