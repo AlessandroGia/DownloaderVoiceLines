@@ -1,1 +1,4 @@
 path_directory.bin
+
+__pycache__
+.idea
