@@ -1,8 +1,8 @@
 from asyncio import ensure_future, gather
 from aiohttp import ClientSession
 from utils import check_path
+from vgs_parser import Vgs
 from os import system
-from VGS import vgs
 
 import os
 
@@ -37,7 +37,7 @@ class Downloader:
                         tasks = []
                         self.__downloaded = 0
                         for vgs_ in pack[name_god][skin_name]:
-                            vgss = vgs(vgs_)
+                            vgss = Vgs(vgs_)
                             if 'https://static.wikia.nocookie.net' in vgss:
                                 return vgs_
                             path_vgs = os.path.join(path_skin, vgss)

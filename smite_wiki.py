@@ -1,4 +1,4 @@
-from Downloader import Downloader
+from downloader import Downloader
 from utils import get_bs
 
 

@@ -1,5 +1,5 @@
 
-def vgs(url):
+def Vgs(url):
 
 
 	#print(url) ###DEBUG
@@ -272,39 +272,39 @@ def vgs(url):
 	if DEATH.lower() in url:
 		return DEATH 
 
-	if "Self_Attack_1".lower() in urlO.lower():
+	if "Self_Attack_1".lower() in url: # urlO.lower()
 		return VSA1
 	if "VSA1".lower() in url:
 		return VSA1 
 
-	if "Self_Attack_2".lower() in urlO.lower():
+	if "Self_Attack_2".lower() in url: #
 		return VSA2
 	if "VSA2".lower() in url:
 		return VSA2 
 	
-	if "Self_Attack_3".lower() in urlO.lower():
+	if "Self_Attack_3".lower() in url: #
 		return VSA3
 	if "VSA3".lower() in url:
 		return VSA3 
 	
-	if "Self_Attack_F".lower() in urlO.lower():
+	if "Self_Attack_F".lower() in url: #
 		return VSAF
 	if "VSAF".lower() in url:
 		return VSAF
 	
-	if "Self_Attack_G".lower() in urlO.lower():
+	if "Self_Attack_G".lower() in url: #
 		return VSAG
 	if "VSAG".lower() in url:
 		return VSAG
 	
-	if "Self_Attack_M".lower() in urlO.lower():
+	if "Self_Attack_M".lower() in url: #
 		return VSAM
-	if "Self_Attack_T".lower() in urlO.lower():
+	if "Self_Attack_T".lower() in url: #
 		return VSAM
 	if "VSAM".lower() in url:
 		return VSAM 
 
-	if "Self_Attack".lower() in urlO.lower():
+	if "Self_Attack".lower() in url: #
 		return VSAA
 	if "VSAA".lower() in url:
 		return VSAA 
@@ -479,7 +479,7 @@ def vgs(url):
 	if "arena_m".lower() in url:
 		return VAN 
 	if "VAN" in urlO:
-		return VN
+		return VAN
 	
 	if "tower_1".lower() in url:
 		return VAT1 
@@ -1042,7 +1042,7 @@ def vgs(url):
 	if "VVVX".lower() in url:
 		return VVVX
 
-	if "OK".lower() in urlO.lower():
+	if "OK".lower() in url: #
 		return VVA
 
 	return url

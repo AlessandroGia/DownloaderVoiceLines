@@ -1,4 +1,4 @@
-from SmiteWiki import SmiteWiki
+from smite_wiki import SmiteWiki
 from asyncio import run
 
 import os
