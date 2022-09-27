@@ -1,5 +1,7 @@
+from exceptions.input_exceptions import GodNotFound, OptionNotFound, PathNotFound, Exit
 from smite_wiki import SmiteWiki
 from asyncio import run
+from utils import clear
 
 import os
 
@@ -21,22 +23,23 @@ class UI:
             return file.read().decode()
 
     @staticmethod
-    def __input_choice() -> int:
-        while True:
-            choice = int(input("1. Default\n2. Skins\n3. Entrambi\n8. Esci\n"))
-            if 1 <= choice <= 3:
-                break
-        os.system("cls")
-        return choice
+    def __input_option() -> int:
+        option = int(input("1. Default\n2. Skins\n3 Entrambi\n"))
+        if not 1 <= option <= 3:
+            raise OptionNotFound
+        if option == 8:
+            raise Exit
+        clear()
+        return option
 
     def __input_god(self) -> str:
-        while True:
-            god = input("Inserisci il god: ").lower()
-            if god in self.__smitewiki.gods():
-                break
-            print("god inesistente")
-        os.system("cls")
-        return god
+        choice = input("Inserisci il god: ").lower().strip()
+        if not choice in self.__smitewiki.gods():
+            print("God inesistente!")
+            raise GodNotFound
+        elif choice == "exit":
+            raise Exit
+        return choice
 
     def __change_path(self) -> str:
         path = ""
@@ -64,20 +67,30 @@ class UI:
             return self.__change_path()
 
     async def start(self) -> None:
-        choice = 0
-        while choice != 8:
-            os.system("cls")
-            god = self.__input_god()
-            choice = self.__input_choice()
-            if choice == 1:
-                await self.__smitewiki.voice_god(god)
-            elif choice == 2:
-                await self.__smitewiki.voice_skins_god(god)
-            elif choice == 3:
-                await self.__smitewiki.voice_god(god)
-                await self.__smitewiki.voice_skins_god(god)
-            elif choice == 8:
-                continue
+
+        clear()
+
+        while True:
+            try: god = self.__input_god()
+            except GodNotFound: continue
+            except Exit: return None
+            else: break
+
+        while True:
+            try: option = self.__input_option()
+            except OptionNotFound: continue
+            except ValueError: continue
+            except Exit: return None
+            else: break
+
+        if option == 1:
+            await self.__smitewiki.voice_god(god)
+        elif option == 2:
+            await self.__smitewiki.voice_skins_god(god)
+        elif option == 3:
+            await self.__smitewiki.voice_god(god)
+            await self.__smitewiki.voice_skins_god(god)
+            
 
 
 if __name__ == '__main__':

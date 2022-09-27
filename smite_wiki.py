@@ -28,7 +28,7 @@ class SmiteWiki:
                     voices_links.append(str(x.get('href')))
         return skin_name, voices_links
 
-    def __updateListGods(self) -> None:
+    def __update_list_gods(self) -> None:
         self.__num_gods = len(self.__ulgods.find_all("li"))
         for ligods in self.__ulgods.find_all("li"):
             self.__gods.append(
@@ -63,5 +63,5 @@ class SmiteWiki:
 
     def gods(self) -> list:
         if len(self.__ulgods.find_all("li")) != self.__num_gods:
-            self.__updateListGods()
+            self.__update_list_gods()
         return self.__gods

@@ -14,3 +14,8 @@ def get_bs(url: str) -> bs:
     ''' Get url's html istance
     '''
     return bs(get(url).text, "html.parser")
+
+def clear() -> None:
+    ''' Clear the terminal
+    '''
+    os.system('cls' if os.name == 'nt' else 'clear')
