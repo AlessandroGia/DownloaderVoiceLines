@@ -1,19 +1,21 @@
+from asyncio import get_event_loop
+from utils import get_bs, a_get_bs
 from downloader import Downloader
-from utils import get_bs
 
 
 class SmiteWiki:
 
     def __init__(self, url: str) -> None:
-        self.__ulgods = get_bs("https://smite.fandom.com/wiki/God_voicelines").find("h2").next_sibling.next_sibling  # <ul> ..... </ul>
+        
+        self.__ulgods = get_bs("https://smite.fandom.com/wiki/God_voicelines").find("h2").next_sibling.next_sibling # <ul> ..... </ul>
         self.__downloader = Downloader(url)
         self.__gods = []
         self.__num_gods = 0
         self.__update_list_gods()
 
-    def __links(self, link: str) -> list([str, str]):
+    async def __links(self, link: str) -> list([str, str]):
         voices_links = []
-        content = get_bs("https://smite.fandom.com/" + link)
+        content = await a_get_bs("https://smite.fandom.com/" + link)
         h1 = content.find("h1").text.replace("voicelines", "").strip()
         if h1.lower() in self.__gods:
             skin_name = "default"
@@ -38,14 +40,14 @@ class SmiteWiki:
         for ligods in self.__ulgods.find_all("li"):
             if god_name in ligods.a.get("title").lower():
                 linkgod = ligods.a.get("href")
-        skinName, links = self.__links(linkgod)
+        skinName, links = await self.__links(linkgod)
         links_god[god_name][skinName] = links
         await self.__downloader.download(links_god)
         #print(linksGod)
         return None
 
     async def voice_skins_god(self, god_name: str) -> None:
-        wiki = get_bs("https://smite.fandom.com/wiki/Skin_voicelines")
+        wiki = await a_get_bs("https://smite.fandom.com/wiki/Skin_voicelines")
         god = god_name.replace(" ", "_") + "_skins"
         link_skins = []
         _link_skins = {god_name: {}}
@@ -55,7 +57,7 @@ class SmiteWiki:
         for li in ul.find_all("li"):
             link_skins.append(li.a.get("href"))
         for link in link_skins:
-            skinName, links = self.__links(link)
+            skinName, links = await self.__links(link)
             _link_skins[god_name][skinName] = links
         await self.__downloader.download(_link_skins)
         return None

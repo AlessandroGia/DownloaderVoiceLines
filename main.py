@@ -1,7 +1,7 @@
 from exceptions.input_exceptions import GodNotFound, OptionNotFound, PathNotFound, Exit
 from smite_wiki import SmiteWiki
-from asyncio import run
 from utils import clear, exit
+from asyncio import run
 
 import os
 
@@ -24,7 +24,7 @@ class UI:
 
     @staticmethod
     def __input_option() -> int:
-        option = int(input("1. Default\n2. Skins\n3 Entrambi\n"))
+        option = int(input("1. Default\n2. Skins\n3. Entrambi\n"))
         if not option or option == 8:
             raise Exit
         elif not 1 <= option <= 3:
@@ -42,6 +42,7 @@ class UI:
         return choice
 
     def __choice_path(self, path: str) -> str:
+        clear()
         choice = input("Usare questo percorso:\n\t{} ~ S/N ".format(path)).lower().strip()
         if not choice or choice == "exit":
             raise Exit
@@ -55,14 +56,48 @@ class UI:
         else:
             raise OptionNotFound
 
-        
+    def __check_path(self, path: str) -> str:
+
+        path = os.path.join(*list(filter(None, path.split(os.sep))))
+        if not os.name == "nt": path = os.sep + path
+
+        if os.path.exists(path):
+            while True:
+                if "voicelines" in os.listdir(path) and os.path.isdir(os.path.join(path, "voicelines")):
+                    choice = input("Usare la cartella :\n\t(Gia' presente) {}/voicelines ~ S/N ".format(path.split(os.sep)[-1])).lower().strip()
+                else:
+                    choice = input("Creare la cartella:\n\t{}/voicelines ~ S/N ".format(path.split(os.sep)[-1])).lower().strip()
+                if not choice or choice == "exit": raise Exit
+                elif choice == "s": return path
+                elif choice == "n": raise PathNotFound
+                else: continue
+        else:
+            raise PathNotFound
+        #else:
+        #    dir = path.split(os.sep)[-1]
+        #    path_c = os.path.join(*list(filter(None, path.split(os.sep)[:-1])))
+        #    if not os.name == "nt": path_c = os.sep + path_c
+        #    if not os.path.exists(path_c): raise PathNotFound
+        #    else:
+        #        while True:
+        #            choice = input("Vuoi creare la cartella '{}' in '{}' S/N ".format(dir, path_c)).lower().strip()
+        #            if not choice or choice == "exit": raise Exit
+        #            elif choice == "s": 
+        #                os.mkdir(path)
+        #                return path
+        #            elif choice == "n": raise PathNotFound
+        #            else: continue
+
     def __change_path(self) -> str:
-        path = input("Inserisci il percorso: ")
+        clear()
+        path = input("Percorso per la cartella: ")
         if not path:
             raise Exit
-        if not os.path.exists(path):
-            print("percorso inesistente!")
-            raise PathNotFound
+
+        try: path = self.__check_path(path)
+        except Exit: exit()
+        except PathNotFound: raise PathNotFound
+
         self.__write_on_file(path)
         return path
 
@@ -80,26 +115,21 @@ class UI:
                 except Exit: exit()
 
     async def start(self) -> None:
-
         while True:
-
             clear()
-
             while True:
                 try: god = self.__input_god()
                 except GodNotFound: continue
                 except Exit: exit()
                 else: break
-
             clear()
-
             while True:
                 try: option = self.__input_option()
                 except OptionNotFound: continue
                 except ValueError: continue
                 except Exit: exit()
                 else: break
-
+            print("Scaricando...\n")
             if option == 1:
                 await self.__smitewiki.voice_god(god)
             elif option == 2:
