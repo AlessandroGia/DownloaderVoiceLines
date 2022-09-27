@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup as bs
 from requests import get
 
+import sys
 import os
 
 
@@ -19,3 +20,8 @@ def clear() -> None:
     ''' Clear the terminal
     '''
     os.system('cls' if os.name == 'nt' else 'clear')
+
+def exit() -> None:
+    ''' Exit from the script
+    '''
+    sys.exit(0)

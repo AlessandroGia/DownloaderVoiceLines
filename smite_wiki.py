@@ -5,12 +5,11 @@ from utils import get_bs
 class SmiteWiki:
 
     def __init__(self, url: str) -> None:
-        gods_contents = get_bs("https://smite.fandom.com/wiki/God_voicelines")
-        self.__ulgods = gods_contents.find("h2").next_sibling.next_sibling  # <ul> ..... </ul>
+        self.__ulgods = get_bs("https://smite.fandom.com/wiki/God_voicelines").find("h2").next_sibling.next_sibling  # <ul> ..... </ul>
         self.__downloader = Downloader(url)
         self.__gods = []
         self.__num_gods = 0
-        self.__updateListGods()
+        self.__update_list_gods()
 
     def __links(self, link: str) -> list([str, str]):
         voices_links = []

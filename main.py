@@ -1,7 +1,7 @@
 from exceptions.input_exceptions import GodNotFound, OptionNotFound, PathNotFound, Exit
 from smite_wiki import SmiteWiki
 from asyncio import run
-from utils import clear
+from utils import clear, exit
 
 import os
 
@@ -25,72 +25,88 @@ class UI:
     @staticmethod
     def __input_option() -> int:
         option = int(input("1. Default\n2. Skins\n3 Entrambi\n"))
-        if not 1 <= option <= 3:
-            raise OptionNotFound
-        if option == 8:
+        if not option or option == 8:
             raise Exit
+        elif not 1 <= option <= 3:
+            raise OptionNotFound
         clear()
         return option
 
     def __input_god(self) -> str:
         choice = input("Inserisci il god: ").lower().strip()
-        if not choice in self.__smitewiki.gods():
+        if not choice or choice == "exit":
+            raise Exit
+        elif not choice in self.__smitewiki.gods():
             print("God inesistente!")
             raise GodNotFound
-        elif choice == "exit":
-            raise Exit
         return choice
 
+    def __choice_path(self, path: str) -> str:
+        choice = input("Usare questo percorso:\n\t{} ~ S/N ".format(path)).lower().strip()
+        if not choice or choice == "exit":
+            raise Exit
+        elif choice == 's':
+            return path
+        elif choice == 'n':
+            while True:
+                try: return self.__change_path()
+                except PathNotFound: continue
+                except Exit: exit()
+        else:
+            raise OptionNotFound
+
+        
     def __change_path(self) -> str:
-        path = ""
-        while not path:
-            path = input("Inserisci il percorso: ")
-            if not os.path.exists(path):
-                print("percorso inesistente!")
-                path = ""
-            self.__write_on_file(path)
+        path = input("Inserisci il percorso: ")
+        if not path:
+            raise Exit
+        if not os.path.exists(path):
+            print("percorso inesistente!")
+            raise PathNotFound
+        self.__write_on_file(path)
         return path
 
     def __get_url_directory(self) -> str:
-        path = ""
-        if os.path.exists("path_directory.bin"):
-            path = self.__read_from_file()
+        path = self.__read_from_file() if os.path.exists("path_directory.bin") else None
         if path:
-            choice = input("Usare questo percorso: " + path + " S/N ")
-            if choice.lower() == "s":
-                return path
-            elif choice.lower() == 'n':
-                return self.__change_path()
-            else:
-                pass
+            while True:
+                try: return self.__choice_path(path)
+                except OptionNotFound: continue
+                except Exit: exit()
         else:
-            return self.__change_path()
+            while True:
+                try: return self.__change_path()
+                except PathNotFound: continue
+                except Exit: exit()
 
     async def start(self) -> None:
 
-        clear()
-
         while True:
-            try: god = self.__input_god()
-            except GodNotFound: continue
-            except Exit: return None
-            else: break
 
-        while True:
-            try: option = self.__input_option()
-            except OptionNotFound: continue
-            except ValueError: continue
-            except Exit: return None
-            else: break
+            clear()
 
-        if option == 1:
-            await self.__smitewiki.voice_god(god)
-        elif option == 2:
-            await self.__smitewiki.voice_skins_god(god)
-        elif option == 3:
-            await self.__smitewiki.voice_god(god)
-            await self.__smitewiki.voice_skins_god(god)
-            
+            while True:
+                try: god = self.__input_god()
+                except GodNotFound: continue
+                except Exit: exit()
+                else: break
+
+            clear()
+
+            while True:
+                try: option = self.__input_option()
+                except OptionNotFound: continue
+                except ValueError: continue
+                except Exit: exit()
+                else: break
+
+            if option == 1:
+                await self.__smitewiki.voice_god(god)
+            elif option == 2:
+                await self.__smitewiki.voice_skins_god(god)
+            elif option == 3:
+                await self.__smitewiki.voice_god(god)
+                await self.__smitewiki.voice_skins_god(god)
 
 
 if __name__ == '__main__':
