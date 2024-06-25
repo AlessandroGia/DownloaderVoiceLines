@@ -1,2 +1,2 @@
 # Voiceline Downloader
- Download smite god voicelines (SmiteWiki)
+ Download smite gods voicelines (SmiteWiki)
